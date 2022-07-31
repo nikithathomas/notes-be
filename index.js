@@ -83,7 +83,7 @@ app.put('/api/notes/:noteId',(request,response)=>{
 });
 
 app.get('/',(request,response)=>{
-    response.redirect('/api/notes');
+    response.redirect('/index.html');
 });
 
 const PORT = process.env.PORT||3001;

@@ -46,7 +46,7 @@ app.post('/api/notes',(request,response)=>{
 app.put('/api/notes/:noteId',(request,response)=>{
     const noteId=parseInt(request.params.noteId,10);
     
-    if(noteId && typeof noteId==='number' && notes.length){
+    if(noteId && typeof noteId==='number'){
         Note.findById(noteId).then((selectedNote)=>{
             return selectedNote;
         }).then((result)=>{
@@ -54,7 +54,7 @@ app.put('/api/notes/:noteId',(request,response)=>{
             const updatedNoteImportant={$set:{important:!noteImportant}};
             return Note.updateOne({id:noteId},updatedNoteImportant);
         }).then((updatedNote)=>{
-            return response.json(updatedNote);
+            response.json(updatedNote);
         }).catch((error)=>{
             return response.status(400).send({error:`The note has not been updated`});
         })

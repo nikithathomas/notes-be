@@ -59,11 +59,10 @@ app.put('/api/notes/:noteId',(request,response)=>{
         }).then((updatedNote)=>{
             return response.send(updatedNote);
         }).catch((error)=>{
-            console.log('Update failed');
+            return response.status(400).send({error:`The note has not been updated`});
         })
-        return response.status(400).send({error:`The note ${noteId} is not present`});
+        
     }
-    return response.status(400).send({error:`The input is incorrect`});
 });
 
 app.get('/',(request,response)=>{

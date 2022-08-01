@@ -18,7 +18,7 @@ app.get('/api/notes',(request,response)=>{
 })
 
 app.get('/api/notes/:id',(request,response)=>{
-    const inputId=Number(request.params.id);
+    const inputId=request.params.id;
     Note.findById(inputId).then((selectedNote)=>{
         response.json(selectedNote);
     }); 
@@ -44,7 +44,7 @@ app.post('/api/notes',(request,response)=>{
 });
 
 app.put('/api/notes/:noteId',(request,response)=>{
-    const noteId=parseInt(request.params.noteId,10);
+    const noteId=request.params.noteId;
     
     if(noteId && typeof noteId==='number'){
         Note.findById(noteId).then((selectedNote)=>{

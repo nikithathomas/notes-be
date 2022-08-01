@@ -23,10 +23,7 @@ app.get('/api/notes/:id',(request,response)=>{
         response.json(selectedNote);
     }); 
 });
-// const generateId=()=>{
-//     const maxId=notes.length>0?Math.max(...notes.map((note)=>note.id)):0;
-//     return maxId+1;
-// }
+
 app.post('/api/notes',(request,response)=>{
   const body=request.body;
 
@@ -57,7 +54,7 @@ app.put('/api/notes/:noteId',(request,response)=>{
             const updatedNoteImportant={$set:{important:!noteImportant}};
             return Note.updateOne({id:noteId},updatedNoteImportant);
         }).then((updatedNote)=>{
-            return response.send(updatedNote);
+            return response.json(updatedNote);
         }).catch((error)=>{
             return response.status(400).send({error:`The note has not been updated`});
         })

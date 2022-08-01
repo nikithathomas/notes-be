@@ -48,9 +48,10 @@ app.put('/api/notes/:noteId',(request,response)=>{
     
     if(noteId && typeof noteId==='number'){
         Note.findById(noteId).then((selectedNote)=>{
+            console.log('Selected note',selectedNote);
             return selectedNote;
         }).then((result)=>{
-            console.log('result',result)
+            console.log('result',result);
             const noteImportant=result.important;
             const updatedNoteImportant={$set:{important:!noteImportant}};
             return Note.updateOne({id:noteId},updatedNoteImportant);

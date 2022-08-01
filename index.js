@@ -46,7 +46,7 @@ app.post('/api/notes',(request,response)=>{
 app.put('/api/notes/:noteId',(request,response)=>{
     const noteId=request.params.noteId;
     
-    if(noteId && typeof noteId==='number'){
+    if(noteId && noteId.length){
         Note.findById(noteId).then((selectedNote)=>{
             console.log('Selected note',selectedNote);
             return selectedNote;

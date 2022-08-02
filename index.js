@@ -52,6 +52,7 @@ app.put('/api/notes/:noteId',(request,response)=>{
         }).then((result)=>{
             const noteImportant=result.important;
             const updatedNoteImportant={$set:{important:!noteImportant}};
+            console.log("Data",updatedNoteImportant);
             return Note.updateOne({id:noteId},updatedNoteImportant);
         }).then((result)=>{
             return Note.findById(noteId);           

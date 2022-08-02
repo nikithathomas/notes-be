@@ -51,11 +51,13 @@ app.put('/api/notes/:noteId',(request,response)=>{
             return selectedNote;
         }).then((result)=>{
             const noteImportant=result.important;
+            console.log('Result',result);
             const updatedNoteImportant={$set:{important:noteImportant}};
             return Note.updateOne({id:noteId},updatedNoteImportant);
         }).then((result)=>{
             return Note.findById(noteId);           
         }).then((updatedNote)=>{
+            console.log('Updated Note',updatedNote);
             response.json(updatedNote);
         }).catch((error)=>{
             return response.status(400).send({error:`The note has not been updated`});

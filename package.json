@@ -13,7 +13,6 @@
     "logs:prod": "heroku logs --tail",
     "mongo:try": "node mongo.js IGFfK6EgfmSaxhP9"
   },
-  "proxy": "http://localhost:3001",
   "author": "",
   "license": "ISC",
   "dependencies": {

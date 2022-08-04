@@ -10,10 +10,9 @@ const api = supertest(app);
 
 beforeEach(async () => {
     await Note.deleteMany({});
-    let noteObject = new Note(testHelper.initialNotes[0]);
-    await noteObject.save();
-    noteObject = new Note(testHelper.initialNotes[1]);
-    await noteObject.save();
+    const noteObjects=testHelper.forEach((note)=>new Note(note));
+    const promiseArray=noteObjects.map(note=>note.save());
+    await Promise.all(promiseArray);
 })
 test('notes are returned as json', async () => {
     await api.get('/api/notes').expect(200).expect('Content-type', /application\/json/);

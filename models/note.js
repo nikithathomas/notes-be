@@ -1,18 +1,17 @@
 const mongoose=require('mongoose');
 
-const url=process.env.MONGODB_URI;
-
-mongoose.connect(url).then(()=>{
-    console.log('Db connected');
-}).catch((error)=>{
-    console.log('Error in db connection');
-});
-
-const noteSchema=new mongoose.Schema({
-    content:String,
-    date:Date,
-    important:Boolean
-});
+const noteSchema = new mongoose.Schema({
+    content: {
+      type: String,
+      required: true,
+      minlength: 5
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    important: Boolean,
+  })
 
 noteSchema.set('toJSON',{
     transform:(document, returnedObject)=>{

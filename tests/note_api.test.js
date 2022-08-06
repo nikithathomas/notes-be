@@ -87,7 +87,7 @@ describe('Viewing a specific note', () => {
     })
 })
 
-describe('deletion of a note', () => {
+describe('deletion of a note',() => {
     test('a specific note can be deleted', async () => {
         const notes = await testHelper.notesInDb();
         const firstNote = notes[0];

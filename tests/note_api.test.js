@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
+const bcrypt=require('bcrypt');
+
 const app = require('../app');
 const Note = require('../models/note');
+const User=require('../models/user');
+
 const testHelper = require('./test_helper');
 
 const api = supertest(app);
@@ -9,11 +13,32 @@ const api = supertest(app);
 
 
 beforeEach(async () => {
-    await Note.deleteMany({});
     // const noteObjects=testHelper.forEach((note)=>new Note(note));
     // const promiseArray=noteObjects.map(note=>note.save());
     // await Promise.all(promiseArray);
-    await Note.insertMany(testHelper.initialNotes);
+    await Note.deleteMany({});
+    await User.deleteMany({});
+
+    const newUser = new User({
+        username: 'root',
+        name:'root',
+        passwordHash: await bcrypt.hash('sekret', 10)
+    });
+
+    const savedUser=await newUser.save();
+
+    const newNote=testHelper.initialNotes[0];
+
+    newNote.user=savedUser._id;
+
+    const newNoteModel=new Note(newNote);
+
+    const savedNote=await newNoteModel.save();
+
+    savedUser.notes=savedUser.notes.concat(savedNote._id);
+
+    await savedUser.save();
+    
 })
 describe('when there is initially some notes saved', () => {
     test('notes are returned as json', async () => {
@@ -23,7 +48,7 @@ describe('when there is initially some notes saved', () => {
     test('all notes are returned', async () => {
         const response = await api.get('/api/notes');
 
-        expect(response.body).toHaveLength(testHelper.initialNotes.length);
+        expect(response.body).toHaveLength(1);
     });
     test('a specific note is within the returned notes', async () => {
         const response = await api.get('/api/notes');
@@ -36,18 +61,29 @@ describe('when there is initially some notes saved', () => {
 
 describe('addition of a new note', () => {
     test('a valid note can be added', async () => {
+        const userToLogin={
+            username:'root',
+            password:'sekret'
+        }
+
+        const loginUser=await api.post('/api/login').send(userToLogin);
+        const {jwtToken:token}=loginUser.body;
+
         const newNote = {
             content: 'async/await simplifies making async calls',
             important: true,
             date: new Date(),
         }
-        await api.post('/api/notes').send(newNote).expect(201).expect('Content-type', /application\/json/);
+        const savedNote=await api.post('/api/notes').send(newNote).set('Authorization',`bearer ${token}`).expect(201).expect('Content-type', /application\/json/);
         const response = await testHelper.notesInDb();
+
+        const {user}=savedNote.body;
 
         const contents = response.map(note => note.content);
 
-        expect(contents).toHaveLength(testHelper.initialNotes.length + 1);
+        expect(contents).toHaveLength(2);
         expect(contents).toContain(newNote.content);
+        expect(user.toString().length).toBeGreaterThan(0);
     })
     test('a note without content cannot be added', async () => {
         const newNote = {
@@ -59,8 +95,16 @@ describe('addition of a new note', () => {
 
         const contents = response.map(note => note.content);
 
-        expect(contents).toHaveLength(testHelper.initialNotes.length);
+        expect(contents).toHaveLength(1);
     });
+    test('a note without a valid token',async()=>{
+        const newNote = {
+            content: 'async/await simplifies making async calls',
+            important: true,
+            date: new Date(),
+        }
+        await api.post('/api/notes').send(newNote).expect(401);
+    })
 })
 
 describe('Viewing a specific note', () => {
@@ -96,7 +140,7 @@ describe('deletion of a note',() => {
 
         const notesAtEnd = await testHelper.notesInDb();
 
-        expect(notesAtEnd.length).toBe(testHelper.initialNotes.length - 1);
+        expect(notesAtEnd.length).toBe(0);
 
         const noteContents = notesAtEnd.map((note) => note.content);
 
